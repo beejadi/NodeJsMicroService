@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Microservice Interaction</title>
+</head>
+<body>
+  <h1>Microservice Interaction</h1>
+  <form id="interactionForm">
+    <label for="message">Message:</label>
+    <input type="text" id="message" required>
+    <button type="submit">Send and Receive</button>
+  </form>
+  <div id="response"></div>
+
+  <script>
+    document.getElementById('interactionForm').addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const message = document.getElementById('message').value;
+
+      // Send data to Microservice 1 (Sender)
+      const senderResponse = await fetch('http://localhost:3001/send', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ message })
+      });
+
+      // Display sender response
+      const senderData = await senderResponse.json();
+      const responseElement = document.getElementById('response');
+      responseElement.innerHTML = `<p>Sender: ${senderData.message}</p>`;
+
+      // Fetch data from Microservice 2 (Receiver)
+      const receiverResponse = await fetch('http://localhost:3002/receive', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ message })
+      });
+      console.log(receiverResponse);
+
+      // Display receiver response
+      const receiverData = await receiverResponse.json();
+      responseElement.innerHTML += `<p>Receiver: ${receiverData.message}</p>`;
+    });
+  </script>
+</body>
+</html>
